@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>テトリス</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        canvas {
+            border: 1px solid #000;
+            background-color: #fff;
+            display: block;
+            margin: 0 auto;
+        }
+        #score, #timer, #controls, #difficulty {
+            font-size: 20px;
+            margin-top: 10px;
+            text-align: center;
+        }
+        #controls ul, #difficulty ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        #controls li, #difficulty li {
+            margin: 5px 0;
+        }
+        #startButton {
+            font-size: 18px;
+            padding: 10px 20px;
+            margin-top: 10px;
+        }
+        #gameContainer {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="difficulty">
+        <p><strong>難易度を選択してください:</strong></p>
+        <ul>
+            <li><input type="radio" name="level" value="1" id="level1" checked> <label for="level1">レベル1（ゆっくり）</label></li>
+            <li><input type="radio" name="level" value="2" id="level2"> <label for="level2">レベル2（徐々に速く）</label></li>
+            <li><input type="radio" name="level" value="3" id="level3"> <label for="level3">レベル鬼（最初から速い）</label></li>
+        </ul>
+        <button id="startButton">ゲーム開始</button>
+    </div>
+    <div id="gameContainer">
+        <canvas id="tetris" width="240" height="400"></canvas>
+        <div id="score">スコア: 0</div>
+        <div id="timer">タイマー: 0秒</div>
+        <div id="controls">
+            <p><strong>操作方法:</strong></p>
+            <ul>
+                <li>左矢印キー：左に移動</li>
+                <li>右矢印キー：右に移動</li>
+                <li>下矢印キー：素早く落下</li>
+                <li>Qキー：左回転</li>
+                <li>Wキー：右回転</li>
+            </ul>
+        </div>
+    </div>
+    <script src="tetris.js"></script>
+</body>
+</html>
