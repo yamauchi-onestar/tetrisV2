@@ -4,6 +4,7 @@ const grid = 20;
 context.scale(grid, grid);
 
 let score = 0;
+let highScore = 0;
 let pieceBag = [];
 let startTime = null;
 let elapsedTime = 0;
@@ -14,27 +15,75 @@ let lastTime = 0;
 let dropCounter = 0;
 let level = 1; // デフォルトのレベル
 
+// ハイスコアの読み込み
+if (localStorage.getItem('tetrisHighScore')) {
+    highScore = parseInt(localStorage.getItem('tetrisHighScore'));
+    updateHighScore();
+}
+
 function arenaSweep() {
-    let rowCount = 0;
+    let linesCleared = 0;
+    const linesToClear = [];
     outer: for (let y = arena.length -1; y > 0; --y) {
         for (let x = 0; x < arena[y].length; ++x) {
             if (arena[y][x] === 0) {
                 continue outer;
             }
         }
-        const row = arena.splice(y, 1)[0].fill(0);
-        arena.unshift(row);
-        ++y;
-        rowCount++;
+        linesToClear.push(y);
     }
-    if (rowCount > 0) {
-        score += rowCount * 10;
-        updateScore();
-        // レベル2の場合、ラインを消すごとに速度を上げる
-        if (level === 2) {
-            dropInterval *= 0.9; // 落下速度を速くする
-        }
+    if (linesToClear.length > 0) {
+        linesCleared = linesToClear.length;
+
+        // ライン消去エフェクトを表示
+        linesToClear.forEach(y => {
+            showLineClearEffect(y);
+        });
+
+        setTimeout(() => {
+            // 実際にラインを消去
+            linesToClear.forEach(y => {
+                const row = arena.splice(y, 1)[0].fill(0);
+                arena.unshift(row);
+            });
+
+            // スコア計算
+            let points = 0;
+            switch(linesCleared) {
+                case 1:
+                    points = 40;
+                    break;
+                case 2:
+                    points = 100;
+                    break;
+                case 3:
+                    points = 300;
+                    break;
+                case 4:
+                    points = 1200;
+                    break;
+                default:
+                    points = linesCleared * 300; // 5ライン以上の場合
+            }
+            score += points;
+            updateScore();
+
+            // レベル2の場合、ラインを消すごとに速度を上げる
+            if (level === 2) {
+                dropInterval *= 0.9; // 落下速度を速くする
+            }
+        }, 200); // エフェクト表示のために遅延
     }
+}
+
+function showLineClearEffect(row) {
+    const effect = document.createElement('div');
+    effect.classList.add('line-clear');
+    effect.style.top = (row * 20) + 'px';
+    document.body.appendChild(effect);
+    setTimeout(() => {
+        document.body.removeChild(effect);
+    }, 200);
 }
 
 function collide(arena, player) {
@@ -205,6 +254,12 @@ function playerReset() {
 
     if (collide(arena, player)) {
         arena.forEach(row => row.fill(0));
+        // ハイスコアの更新
+        if (score > highScore) {
+            highScore = score;
+            localStorage.setItem('tetrisHighScore', highScore);
+            updateHighScore();
+        }
         score = 0;
         updateScore();
         isGameOver = true;
@@ -229,13 +284,28 @@ function playerRotate(dir) {
 }
 
 function updateScore() {
-    document.getElementById('score').innerText = 'スコア: ' + score;
+    const scoreElement = document.getElementById('score');
+    scoreElement.innerText = 'スコア: ' + score;
+    // スコア強調表示
+    scoreElement.classList.add('flash');
+    setTimeout(() => {
+        scoreElement.classList.remove('flash');
+    }, 500);
+}
+
+function updateHighScore() {
+    const highScoreElement = document.getElementById('highScore');
+    highScoreElement.innerText = 'ハイスコア: ' + highScore;
 }
 
 function updateTimer() {
     if (isGameOver) return;
-    elapsedTime = ((performance.now() - startTime) / 1000) | 0;
-    document.getElementById('timer').innerText = 'タイマー: ' + elapsedTime + '秒';
+    elapsedTime = (performance.now() - startTime) / 1000;
+    const minutes = Math.floor(elapsedTime / 60);
+    const seconds = Math.floor(elapsedTime % 60);
+    const formattedMinutes = minutes.toString().padStart(2, '0');
+    const formattedSeconds = seconds.toString().padStart(2, '0');
+    document.getElementById('timer').innerText = 'タイマー: ' + formattedMinutes + '分' + formattedSeconds + '秒';
 }
 
 function update(time = 0) {
@@ -306,4 +376,3 @@ function startGame() {
     updateTimer();
     update();
 }
-
