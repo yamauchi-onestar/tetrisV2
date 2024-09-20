@@ -13,7 +13,7 @@
             display: block;
             margin: 0 auto;
         }
-        #score, #timer, #controls, #difficulty {
+        #score, #highScore, #timer, #controls, #difficulty {
             font-size: 20px;
             margin-top: 10px;
             text-align: center;
@@ -33,6 +33,33 @@
         #gameContainer {
             display: none;
         }
+        /* スコア強調表示のためのアニメーション */
+        @keyframes scoreFlash {
+            0% {
+                color: #fff700;
+                transform: scale(1);
+            }
+            50% {
+                color: #ff0000;
+                transform: scale(1.5);
+            }
+            100% {
+                color: #fff700;
+                transform: scale(1);
+            }
+        }
+        .flash {
+            animation: scoreFlash 0.5s ease;
+        }
+        /* ライン消去エフェクト用のスタイル */
+        .line-clear {
+            position: absolute;
+            width: 240px;
+            height: 20px;
+            background-color: rgba(255, 255, 255, 0.5);
+            left: 50%;
+            transform: translateX(-50%);
+        }
     </style>
 </head>
 <body>
@@ -48,7 +75,8 @@
     <div id="gameContainer">
         <canvas id="tetris" width="240" height="400"></canvas>
         <div id="score">スコア: 0</div>
-        <div id="timer">タイマー: 0秒</div>
+        <div id="highScore">ハイスコア: 0</div>
+        <div id="timer">タイマー: 00分00秒</div>
         <div id="controls">
             <p><strong>操作方法:</strong></p>
             <ul>
